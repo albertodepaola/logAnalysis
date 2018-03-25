@@ -1,4 +1,17 @@
+# Log Analysis
 
+This project is a simple log analysis tool that answers 3 questions: 
+..* What are the most popular three articles of all time?
+..* Who are the most popular article authors of all time?
+..* On which days did more than 1% of requests lead to errors?
+
+The number of articles, authors and the threshold percentage are configurable in constants in the main script.
+
+# Add this to the database
+
+This simple views were created in order to accelerate and simplify the main queries.
+
+```SQL
 create or replace materialized view log_view_mat as
 select l.*, a.name, ar.title, ar.slug
 from (select id, path, split_part(path, '/', 3) as slug_from_path, ip,  method, status, time from log) l, 
@@ -8,65 +21,15 @@ where slug_from_path = ar.slug
 and a.id = ar.author;
 
 create unique index log_id_idx on log_view_mat(id);
+```
+This view joins log entries with articles through the slug and, in doing so, discards log entries not related to articles. The index allows the materialized view to be refresed concurrently.
 
+```SQL
 refresh materialized view concurrently log_view_mat with data;
+```
+Execute this refresh at leat once a day. TODO: add to cron job or to a insert trigger in the log table.
 
-select count(*) as views, slug
-from log_view
-where slug != ''
-and status = '200 OK'
-group by slug
-order by views desc;
-
-select count(*) as views, slug, name, title
-from log_view
-where slug != ''
-and status = '200 OK'
-group by slug, name, title
-order by views desc;
-
-
-SELECT date_trunc('day', log.time) "day", count(*) as totalViews
-FROM log
-group by 1
-ORDER BY 1;
-
-SELECT date_trunc('day', log.time) "day", count(*) as errorViews
-FROM log
-where status = '404 NOT FOUND'
-group by 1
-ORDER BY 1;
-
-select t.*, e.errorViews, (100 * e.errorViews)::numeric / t.totalViews as percentage from
-(SELECT date_trunc('day', log.time) as day, count(*) as errorViews
-FROM log
-where status = '404 NOT FOUND'
-group by 1
-ORDER BY 1) e,
-(SELECT date_trunc('day', log.time) as day, count(*) as totalViews
-FROM log
-group by 1
-ORDER BY 1) t
-where t.day = e.day
-order by percentage desc;
-
-
-c.execute("select t.*, e.errorViews, (100 * e.errorViews)::numeric / t.totalViews as percentage from " +
-              "(SELECT date_trunc('day', log.time) as day, count(*) as errorViews " +
-              "FROM log " +
-              "where status = '404 NOT FOUND' " +
-              "group by 1 " +
-              "ORDER BY 1) e, " +
-              "(SELECT date_trunc('day', log.time) as day, count(*) as totalViews " +
-              "FROM log " +
-              "group by 1 " +
-              "ORDER BY 1) t " +
-              "where t.day = e.day " +
-              #"and percentage > %s " +
-              "order by percentage desc;", (percent_error_threshold,))
-
-
-
+```SQL
 create materialized view errors_per_day
 as
 select t.*, e.errorViews, (100 * e.errorViews)::numeric / t.totalViews as percentage from
@@ -85,10 +48,12 @@ with data;
 create unique index day_idx on errors_per_day(day);
 
 refresh materialized view CONCURRENTLY errors_per_day;
+```
+This view counts the number of views and errors per day to calculate a percentage of errors per day.
+
+# License
+The content of this repository is licensed under a [Creative Commons Attribution License](https://creativecommons.org/licenses/by/3.0/us/)
 
 
-select * from
-errors_per_day
-where percentage > 0.7
-order by percentage desc;
+
 
