@@ -6,7 +6,8 @@ PERCENT_THRESHOLD = 1
 
 
 def get_most_popular_articles_n_authors(num_articles=NUM_ARTICLES_AUTHORS):
-    """Returns the views, slug, name, title order by most popular according to the log"""
+    """Returns the views, slug, name, title order by most popular according
+    to the log"""
     db = psycopg2.connect(dbname=DBNAME)
     c = db.cursor()
     c.execute("select count(*) as views, name, title " +
@@ -22,7 +23,8 @@ def get_most_popular_articles_n_authors(num_articles=NUM_ARTICLES_AUTHORS):
 
 
 def get_days_with_error(percent_error_threshold=PERCENT_THRESHOLD):
-    """Returns the views, slug, name, title order by most popular according to the log"""
+    """Returns the day, totalViews and errorViews grouped by day according
+    to the log"""
     db = psycopg2.connect(dbname=DBNAME)
     c = db.cursor()
     c.execute("select * from errors_per_day " +
@@ -32,20 +34,24 @@ def get_days_with_error(percent_error_threshold=PERCENT_THRESHOLD):
     db.close()
     return result
 
-print 'Articles'
+
+print
+print 'Most popular articles'
+print
 articles = get_most_popular_articles_n_authors()
 for views, name, title in articles:
     print '"' + title + '"' + " -", views
 
-print 'Authors'
+print
+print 'Most popular authors'
+print
 for views, name, title in articles:
     print name + " -", views
 
-print 'Errors'
+print
+print 'Days with more than %s%% of error' % PERCENT_THRESHOLD
+print
 days_with_error = get_days_with_error()
 for day, totalViews, errorViews, percentage in days_with_error:
     print day.strftime('%B %d, %Y') + " -",  round(percentage, 2), "%"
-
-
-
-
+print
