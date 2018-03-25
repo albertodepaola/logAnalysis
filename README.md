@@ -22,7 +22,7 @@ and a.id = ar.author;
 
 create unique index log_id_idx on log_view_mat(id);
 ```
-This view joins log entries with articles through the slug and, in doing so, discards log entries not related to articles. The index allows the materialized view to be refresed concurrently.
+This view joins log entries with articles through the slug and, in doing so, discards log entries not related to articles. The index allows the materialized view to be refreshed concurrently.
 
 ```SQL
 refresh materialized view concurrently log_view_mat with data;
