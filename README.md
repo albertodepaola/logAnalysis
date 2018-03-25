@@ -1,13 +1,13 @@
 # Log Analysis
 
 This project is a simple log analysis tool that answers 3 questions: 
-..* What are the most popular three articles of all time?
-..* Who are the most popular article authors of all time?
-..* On which days did more than 1% of requests lead to errors?
+- What are the most popular three articles of all time?
+- Who are the most popular article authors of all time?
+- On which days did more than 1% of requests lead to errors?
 
 The number of articles, authors and the threshold percentage are configurable in constants in the main script.
 
-# Add this to the database
+# Views to add to the database
 
 This simple views were created in order to accelerate and simplify the main queries.
 
@@ -49,7 +49,7 @@ create unique index day_idx on errors_per_day(day);
 
 refresh materialized view CONCURRENTLY errors_per_day;
 ```
-This view counts the number of views and errors per day to calculate a percentage of errors per day.
+This view counts the number of views and errors per day to calculate a percentage of errors per day. As with the first, the index allows the view to be updated concurrently. 
 
 # License
 The content of this repository is licensed under a [Creative Commons Attribution License](https://creativecommons.org/licenses/by/3.0/us/)
