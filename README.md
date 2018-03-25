@@ -12,7 +12,7 @@ The number of articles, authors and the threshold percentage are configurable in
 This simple views were created in order to accelerate and simplify the main queries.
 
 ```SQL
-create or replace materialized view log_view_mat as
+create materialized view log_view_mat as
 select l.*, a.name, ar.title, ar.slug
 from (select id, path, split_part(path, '/', 3) as slug_from_path, ip,  method, status, time from log) l, 
 	authors a, 
