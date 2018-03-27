@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import psycopg2
 
 DBNAME = "news"
@@ -35,23 +36,28 @@ def get_days_with_error(percent_error_threshold=PERCENT_THRESHOLD):
     return result
 
 
+def print_result(t, v):
+    print('"' + t + '"' + " -", v)
+
+
 print
-print 'Most popular articles'
+print('Most popular articles')
 print
 articles = get_most_popular_articles_n_authors()
 for views, name, title in articles:
-    print '"' + title + '"' + " -", views
+    print_result(title, views)
 
 print
-print 'Most popular authors'
+print('Most popular authors')
 print
-for views, name, title in articles:
-    print name + " -", views
+authors = get_most_popular_articles_n_authors()
+for views, name, title in authors:
+    print_result(name, views)
 
 print
-print 'Days with more than %s%% of error' % PERCENT_THRESHOLD
+print('Days with more than %s%% of error' % PERCENT_THRESHOLD)
 print
 days_with_error = get_days_with_error()
 for day, totalViews, errorViews, percentage in days_with_error:
-    print day.strftime('%B %d, %Y') + " -",  round(percentage, 2), "%"
+    print(day.strftime('%B %d, %Y') + " -",  round(percentage, 2), "%")
 print
