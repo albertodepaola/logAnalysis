@@ -9,6 +9,8 @@ The number of articles, authors and the threshold percentage are configurable in
 
 # Installation
 
+In order to run the code, python 3.5 or greater is required. Check this [guide](https://wiki.python.org/moin/BeginnersGuide) to install it on your system of choice.
+
 This simple views were created in order to accelerate and simplify the main queries. In order to run the script, this sql snippets should
 be executed in the news database.
 
@@ -52,11 +54,12 @@ refresh materialized view CONCURRENTLY errors_per_day;
 ```
 This view counts the number of views and errors per day to calculate a percentage of errors per day. As with the first, the index allows the view to be updated concurrently.
 
-To run the script against the given database, go to the main folder where the project was cloned and execute this command:
-
- ```python
- python3 logAnalysis.py
- ```
+After creating the views in the database, clone the repository and execute logAnalysis.py:
+```bash
+git clone https://github.com/albertodepaola/logAnalysis.git log_analysis;
+cd log_analysis;
+python3 logAnalysis.py;
+```
  It should give the same output as the ```sample.txt``` file.
 
 # License
