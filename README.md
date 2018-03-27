@@ -7,9 +7,10 @@ This project is a simple log analysis tool that answers 3 questions:
 
 The number of articles, authors and the threshold percentage are configurable in constants in the main script.
 
-# Views to add to the database
+# Installation
 
-This simple views were created in order to accelerate and simplify the main queries.
+This simple views were created in order to accelerate and simplify the main queries. In order to run the script, this sql snippets should
+be executed in the news database.
 
 ```SQL
 create materialized view log_view_mat as
@@ -27,7 +28,7 @@ This view joins log entries with articles through the slug and, in doing so, dis
 ```SQL
 refresh materialized view concurrently log_view_mat with data;
 ```
-Execute this refresh at leat once a day. TODO: add to cron job or to a insert trigger in the log table.
+Execute this refresh at least once a day. TODO: add to cron job or to a insert trigger in the log table.
 
 ```SQL
 create materialized view errors_per_day
@@ -49,7 +50,14 @@ create unique index day_idx on errors_per_day(day);
 
 refresh materialized view CONCURRENTLY errors_per_day;
 ```
-This view counts the number of views and errors per day to calculate a percentage of errors per day. As with the first, the index allows the view to be updated concurrently. 
+This view counts the number of views and errors per day to calculate a percentage of errors per day. As with the first, the index allows the view to be updated concurrently.
+
+To run the script against the given database, go to the main folder where the project was cloned and execute this command:
+
+ ```python
+ python3 logAnalysis.py
+ ```
+ It should give the same output as the ```sample.txt``` file.
 
 # License
 The content of this repository is licensed under a [Creative Commons Attribution License](https://creativecommons.org/licenses/by/3.0/us/)
